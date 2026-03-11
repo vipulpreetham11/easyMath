@@ -1,4 +1,4 @@
-﻿async function loadDashboard() {
+async function loadDashboard() {
     document.body.classList.remove('page-hidden');
     document.getElementById('auth-loader')?.remove();
     await fetchSubjects();
@@ -79,7 +79,7 @@ async function fetchContinueLearning() {
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary" style="padding: 16px 32px; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);" onclick="window.location.href='chapter.html?id=${data.chapter_id}'">
+                <button class="btn btn-primary" style="padding: 16px 32px; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);" onclick="window.location.href='app.html?chapter_id=${data.chapter_id}'">
                     Continue &rarr;
                 </button>
             </div>
