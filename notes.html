@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter Notes - EasyMath</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .notes-layout {
+            display: flex;
+            min-height: calc(100vh - 76px);
+            padding-top: 76px;
+        }
+
+        .notes-sidebar {
+            width: 300px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: calc(100vh - 76px);
+            overflow-y: auto;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notes-sidebar-header {
+            padding: 0 24px 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .notes-sidebar-header h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .notes-sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .note-item {
+            padding: 14px 24px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .note-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .note-item.active {
+            background: rgba(139, 92, 246, 0.1);
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .note-item .note-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-item .note-badge {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .note-badge.pdf {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        .note-badge.opened {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+        }
+
+        .note-content-area {
+            flex: 1;
+            margin-left: 300px;
+            background: var(--bg-color);
+            position: relative;
+            min-height: calc(100vh - 76px);
+        }
+
+        .html-content {
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .html-content h1,
+        .html-content h2,
+        .html-content h3 {
+            color: white;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .html-content p {
+            margin-bottom: 1rem;
+        }
+
+        .html-content ul,
+        .html-content ol {
+            margin-bottom: 1rem;
+            padding-left: 24px;
+        }
+
+        .html-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .html-content code {
+            background: var(--bg-surface-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .html-content pre {
+            background: var(--bg-surface);
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .html-content img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .pdf-container {
+            width: 100%;
+            height: calc(100vh - 76px);
+            border: none;
+        }
+
+        .breadcrumb-bar {
+            padding: 12px 24px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-surface);
+        }
+
+        .breadcrumb-bar a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb-bar a:hover {
+            text-decoration: underline;
+        }
+
+        .progress-counter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-counter .counter-num {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .notes-sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+                max-height: 40vh;
+            }
+
+            .note-content-area {
+                margin-left: 0;
+            }
+
+            .notes-layout {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-hidden">
+    <div class="auth-loader" id="auth-loader">
+        <div
+            style="width:40px;height:40px;border:3px solid #222;border-top-color:#FF4D00;border-radius:50%;animation:auth-spin 0.8s linear infinite">
+        </div>
+    </div>
+    <header>
+        <div class="container nav-container" style="max-width: 100%; padding: 0 32px;">
+            <a href="app.html" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#FF4D00" />
+                            <stop offset="100%" stop-color="#FF4D00" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M4 19l16-14M4 5l16 14M2 12h20"></path>
+                </svg>
+                EasyMath
+            </a>
+            <div class="nav-links">
+                <a href="#" id="back-btn" style="color: white; font-weight: 500;">&larr; Back to Chapter</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="notes-layout">
+        <aside class="notes-sidebar">
+            <div class="notes-sidebar-header">
+                <h3>📋 Chapter Notes</h3>
+                <p id="breadcrumb">Loading...</p>
+            </div>
+            <div id="notes-list">
+                <div class="loader-container text-center" style="padding: 40px;">
+                    <div class="loader"></div>
+                </div>
+            </div>
+            <div class="progress-counter" id="progress-counter" style="display: none;">
+                📊 Opened: <span class="counter-num" id="opened-count">0</span> / <span id="total-count">0</span>
+            </div>
+        </aside>
+
+        <main class="note-content-area" id="note-viewer">
+            <div class="flex-center" style="height: 100%;">
+                <p style="color: var(--text-secondary);">Select a note from the sidebar to view.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mark as Complete Button Overlay -->
+    <div style="position: fixed; bottom: 32px; right: 32px; z-index: 100;">
+        <button id="mark-complete-btn" class="btn btn-primary"
+            style="display: none; padding: 16px 32px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, #10b981, #059669);">
+            ✓ Mark Chapter as Read
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/student/notes.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Mode - EasyMath</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .question-card {
+            background: var(--bg-surface);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid var(--glass-border);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateX(4px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn .opt-letter {
+            font-weight: 700;
+            margin-right: 16px;
+            color: var(--text-secondary);
+            min-width: 20px;
+        }
+
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: #10b981 !important;
+            color: #6ee7b7;
+        }
+
+        .option-btn.correct .opt-letter {
+            color: #10b981;
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: #ef4444 !important;
+            color: #fca5a5;
+        }
+
+        .option-btn.wrong .opt-letter {
+            color: #ef4444;
+        }
+
+        .explanation-box {
+            margin-top: 24px;
+            padding: 20px 24px;
+            border-radius: 12px;
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 4px solid var(--secondary-color);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-surface-light);
+            border-radius: 3px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .breadcrumb-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+
+        .breadcrumb-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb-text a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-row {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-row .btn {
+            min-width: 140px;
+        }
+
+        .difficulty-badge {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .difficulty-badge.easy {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+        }
+
+        .difficulty-badge.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .difficulty-badge.hard {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        /* Completion summary */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 24px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+        }
+
+        .stat-box .stat-num {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stat-box .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 600px) {
+            .question-card {
+                padding: 24px;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-hidden">
+    <div class="auth-loader" id="auth-loader">
+        <div
+            style="width:40px;height:40px;border:3px solid #222;border-top-color:#FF4D00;border-radius:50%;animation:auth-spin 0.8s linear infinite">
+        </div>
+    </div>
+    <header>
+        <div class="container nav-container" style="max-width: 100%; padding: 0 32px;">
+            <a href="app.html" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#FF4D00" />
+                            <stop offset="100%" stop-color="#FF4D00" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M4 19l16-14M4 5l16 14M2 12h20"></path>
+                </svg>
+                EasyMath
+            </a>
+            <div class="nav-links">
+                <a href="#" id="back-btn" style="color: white; font-weight: 500;">&larr; Exit Practice</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container min-h-screen" style="padding-top: 100px; padding-bottom: 60px;">
+        <p class="breadcrumb-text" id="breadcrumb">Loading...</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-bar"></div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 24px;">
+            <span
+                style="color: var(--primary-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;"
+                id="q-counter">Loading...</span>
+        </div>
+
+        <div id="q-container" class="question-card" style="display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; gap: 16px;">
+                <h2 id="q-text" style="font-size: 1.4rem; font-weight: 500; line-height: 1.6; flex: 1;"></h2>
+                <span id="q-difficulty" class="difficulty-badge"></span>
+            </div>
+
+            <div id="options-container">
+                <button class="option-btn" data-opt="a" onclick="selectOption('a')">
+                    <span class="opt-letter">A</span>
+                    <span id="opt-a-text"></span>
+                </button>
+                <button class="option-btn" data-opt="b" onclick="selectOption('b')">
+                    <span class="opt-letter">B</span>
+                    <span id="opt-b-text"></span>
+                </button>
+                <button class="option-btn" data-opt="c" onclick="selectOption('c')">
+                    <span class="opt-letter">C</span>
+                    <span id="opt-c-text"></span>
+                </button>
+                <button class="option-btn" data-opt="d" onclick="selectOption('d')">
+                    <span class="opt-letter">D</span>
+                    <span id="opt-d-text"></span>
+                </button>
+            </div>
+
+            <div class="explanation-box" id="explanation-box">
+                <h4 style="color: #60a5fa; margin-bottom: 8px;">💡 Explanation</h4>
+                <p id="q-exp" style="color: var(--text-primary); line-height: 1.6;"></p>
+            </div>
+
+            <div class="nav-row">
+                <button id="prev-btn" class="btn btn-outline" style="display: none;" onclick="loadPrevQuestion()">&larr;
+                    Previous</button>
+                <div></div>
+                <button id="next-btn" class="btn btn-primary" style="display: none;" onclick="loadNextQuestion()">Next
+                    &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Completion Summary -->
+        <div id="completion-state" class="question-card" style="display: none; text-align: center; padding: 60px 40px;">
+            <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
+            <h2 style="font-size: 2rem; margin-bottom: 8px;">Practice Complete!</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 32px;">You've attempted all practice questions for
+                this chapter.</p>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-num" style="color: #10b981;" id="stat-correct">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: #ef4444;" id="stat-wrong">0</div>
+                    <div class="stat-label">Wrong</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: var(--primary-color);" id="stat-accuracy">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="return-btn" style="padding: 16px 32px;">Return to Chapter</button>
+        </div>
+
+        <div id="loader-state" class="flex-center" style="min-height: 400px;">
+            <div class="loader"></div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/student/practice.js"></script>
+</body>
+
+</html>

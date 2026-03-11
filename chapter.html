@@ -1,0 +1,578 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter Overview - EasyMath</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #0A0A0A;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        :root[data-theme="light"] body {
+            background-color: #f8fafc;
+        }
+
+        /* Banner Header */
+        .chapter-banner {
+            background: linear-gradient(135deg, #FF4D00, #FF8533);
+            color: white;
+            padding: 40px 24px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(255, 77, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .banner-content {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .score-badge {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            text-align: right;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .score-val {
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-top: 4px;
+        }
+
+        #breadcrumb {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        #breadcrumb a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+        }
+
+        #breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        #chapter-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            word-wrap: break-word;
+            word-break: break-word;
+            /* Prevents long words from cutting off */
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #chapter-desc {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.05rem;
+            line-height: 1.5;
+            max-width: 600px;
+        }
+
+        /* Dark/Light Theme Toggle */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(15deg);
+        }
+
+        .moon-icon {
+            display: block;
+        }
+
+        .sun-icon {
+            display: none;
+        }
+
+        :root[data-theme="light"] .moon-icon {
+            display: none;
+        }
+
+        :root[data-theme="light"] .sun-icon {
+            display: block;
+        }
+
+        .banner-controls {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        /* Resources List */
+        .resources-container {
+            max-width: 700px;
+            margin: -30px auto 60px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .resource-card {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        :root[data-theme="light"] .resource-card {
+            background: white;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .resource-card:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        :root[data-theme="light"] .resource-card:hover:not(.disabled) {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Status Colors */
+        .color-notes {
+            border-left: 5px solid #3b82f6;
+        }
+
+        .color-notes .icon-circle {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+
+        .color-practice {
+            border-left: 5px solid #f59e0b;
+        }
+
+        .color-practice .icon-circle {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .color-pyq {
+            border-left: 5px solid #8b5cf6;
+        }
+
+        .color-pyq .icon-circle {
+            background: rgba(139, 92, 246, 0.15);
+            color: #8b5cf6;
+        }
+
+        .color-test {
+            border-left: 5px solid #ec4899;
+        }
+
+        .color-test .icon-circle {
+            background: rgba(236, 72, 153, 0.15);
+            color: #ec4899;
+        }
+
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-right: 20px;
+            transition: transform 0.3s;
+        }
+
+        .resource-card:hover:not(.disabled) .icon-circle {
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        :root[data-theme="light"] .card-content h3 {
+            color: #1e293b;
+        }
+
+        .count-badge {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        :root[data-theme="light"] .count-badge {
+            color: #64748b;
+        }
+
+        /* Arrow / Lock */
+        .action-arrow {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 77, 0, 0.1);
+            color: #FF4D00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            margin-left: 16px;
+        }
+
+        .action-text {
+            color: #FF4D00;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            transform: translateX(-10px);
+        }
+
+        .resource-card:hover:not(.disabled) .action-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .resource-card:hover:not(.disabled) .action-arrow {
+            background: #FF4D00;
+            color: white;
+        }
+
+        /* Disabled State */
+        .resource-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        .resource-card.disabled .action-arrow {
+            background: var(--bg-surface-light);
+            color: var(--text-secondary);
+        }
+
+        .resource-card.disabled .action-text {
+            display: none;
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 600px) {
+            .chapter-banner {
+                padding: 32px 16px 50px;
+                /* Extra bottom padding for overlap */
+            }
+
+            .top-bar {
+                flex-direction: column-reverse;
+                gap: 20px;
+            }
+
+            .banner-controls {
+                width: 100%;
+                justify-content: space-between;
+                flex-direction: row-reverse;
+            }
+
+            #chapter-title {
+                font-size: 2rem;
+            }
+
+            .action-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-hidden">
+    <div class="auth-loader" id="auth-loader">
+        <div
+            style="width:40px;height:40px;border:3px solid #222;border-top-color:#FF4D00;border-radius:50%;animation:auth-spin 0.8s linear infinite">
+        </div>
+    </div>
+
+    <!-- Banner Header -->
+    <header class="chapter-banner">
+        <div class="banner-content">
+            <div class="top-bar">
+                <a href="#" id="back-btn" class="back-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back
+                </a>
+
+                <div class="banner-controls">
+                    <button id="theme-btn" class="theme-toggle" aria-label="Toggle Theme">
+                        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+
+                    <div class="score-badge" id="progress-card">
+                        <div class="score-label">Best Score</div>
+                        <div class="score-val" id="best-score">--%</div>
+                    </div>
+                </div>
+            </div>
+
+            <span id="breadcrumb">Loading...</span>
+            <h2 id="chapter-title">
+                <div class="loader-container" style="justify-content: flex-start;">
+                    <div class="loader" style="width: 24px; height: 24px; border-width: 3px;"></div>
+                </div>
+            </h2>
+            <p id="chapter-desc"></p>
+        </div>
+    </header>
+
+    <main class="resources-container" id="resources-container">
+
+        <!-- Notes -->
+        <a href="#" class="resource-card color-notes disabled" id="card-notes">
+            <div class="icon-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            </div>
+            <div class="card-content">
+                <h3>Chapter Notes</h3>
+                <div class="count-badge" id="count-notes">0 Items</div>
+            </div>
+            <span class="action-text">Read Notes</span>
+            <div class="action-arrow">
+                <svg class="active-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <svg class="locked-icon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- Practice -->
+        <a href="#" class="resource-card color-practice disabled" id="card-practice">
+            <div class="icon-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+            </div>
+            <div class="card-content">
+                <h3>Practice Questions</h3>
+                <div class="count-badge" id="count-practice">0 Questions</div>
+            </div>
+            <span class="action-text">Start Practice</span>
+            <div class="action-arrow">
+                <svg class="active-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <svg class="locked-icon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- PYQ -->
+        <a href="#" class="resource-card color-pyq disabled" id="card-pyq">
+            <div class="icon-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <div class="card-content">
+                <h3>Past Year Questions</h3>
+                <div class="count-badge" id="count-pyq">0 Questions</div>
+            </div>
+            <span class="action-text">Start PYQs</span>
+            <div class="action-arrow">
+                <svg class="active-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <svg class="locked-icon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- Test -->
+        <a href="#" class="resource-card color-test disabled" id="card-test">
+            <div class="icon-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+            <div class="card-content">
+                <h3>Chapter Test</h3>
+                <div class="count-badge" id="count-test">Not Available</div>
+            </div>
+            <span class="action-text">Take Test</span>
+            <div class="action-arrow">
+                <svg class="active-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <svg class="locked-icon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+        </a>
+
+    </main>
+
+    <!-- Theme Logic inline to prevent flash -->
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        document.getElementById('theme-btn').addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Small logic to swap lock icon correctly if disabled
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    const el = mutation.target;
+                    const isDis = el.classList.contains('disabled');
+                    const activeIcon = el.querySelector('.active-icon');
+                    const lockedIcon = el.querySelector('.locked-icon');
+                    if (activeIcon && lockedIcon) {
+                        activeIcon.style.display = isDis ? 'none' : 'block';
+                        lockedIcon.style.display = isDis ? 'block' : 'none';
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('.resource-card').forEach(card => {
+            observer.observe(card, { attributes: true });
+            // Initial run manually to set correct state
+            if (card.classList.contains('disabled')) {
+                const a = card.querySelector('.active-icon'), l = card.querySelector('.locked-icon');
+                if (a && l) { a.style.display = 'none'; l.style.display = 'block'; }
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/student/chapter.js"></script>
+</body>
+
+</html>

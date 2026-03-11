@@ -1,0 +1,822 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - EasyMath</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme Toggle Logic (run before render to prevent flash) -->
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        body {
+            background-color: #0A0A0A;
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 0;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-primary);
+        }
+
+        :root[data-theme="light"] body {
+            background-color: #f8fafc;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .heading-font {
+            font-family: 'Syne', sans-serif;
+        }
+
+        /* 1. FIXED NAVBAR */
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.8);
+        }
+
+        :root[data-theme="light"] .top-navbar {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            font-family: 'Syne', sans-serif;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        :root[data-theme="light"] .theme-toggle {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(15deg);
+        }
+
+        :root[data-theme="light"] .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .moon-icon {
+            display: block;
+        }
+
+        .sun-icon {
+            display: none;
+        }
+
+        :root[data-theme="light"] .moon-icon {
+            display: none;
+        }
+
+        :root[data-theme="light"] .sun-icon {
+            display: block;
+        }
+
+        /* Avatar & Dropdown */
+        .avatar-container {
+            position: relative;
+        }
+
+        .user-avatar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF4D00, #FF8533);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
+            transition: transform 0.2s;
+        }
+
+        .user-avatar-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 56px;
+            right: 0;
+            width: 240px;
+            background: #1A1A1A;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 200;
+        }
+
+        :root[data-theme="light"] .dropdown-menu {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-menu.active {
+            display: flex;
+        }
+
+        .dropdown-header {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .dropdown-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .dropdown-role {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: capitalize;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            width: 100%;
+        }
+
+        :root[data-theme="light"] .dropdown-divider {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        #logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        #logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* 2. MAIN LAYOUT */
+        .container-main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 64px;
+            padding-bottom: 48px;
+        }
+
+        /* HERO SECTION */
+        .hero-section {
+            padding: 48px 24px;
+        }
+
+        .hero-greeting {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .hero-name {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            margin-top: 0;
+            background: linear-gradient(135deg, #FF4D00, #FF8533);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* 3. STATS ROW */
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            padding: 0 24px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .stats-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stat-pill {
+            background: #1A1A1A;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 100px;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        :root[data-theme="light"] .stat-pill {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-icon {
+            color: #FF4D00;
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        /* 4. CONTINUE LEARNING CSS OVERRIDES FOR JS */
+        .dashboard-section {
+            padding: 0 24px;
+            margin-bottom: 40px;
+        }
+
+        #continue-learning-card {
+            background: linear-gradient(135deg, rgba(255, 77, 0, 0.08), rgba(255, 133, 51, 0.04));
+            border-left: 4px solid #FF4D00;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        :root[data-theme="light"] #continue-learning-card {
+            background: linear-gradient(135deg, rgba(255, 77, 0, 0.05), rgba(255, 133, 51, 0.02));
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        #continue-learning-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        :root[data-theme="light"] #continue-learning-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Specific CSS rules to reshape JS injected inner HTML without touching JS logic! */
+        #continue-learning-card>div {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            gap: 16px !important;
+        }
+
+        #continue-learning-card>div>div:first-child {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+        }
+
+        #continue-learning-card>div>div:first-child>h3 {
+            color: #FF4D00 !important;
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            font-family: 'DM Sans', sans-serif !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin: 0 !important;
+        }
+
+        #continue-learning-card>div>div:first-child>p {
+            font-size: 1.3rem !important;
+            font-weight: 700 !important;
+            font-family: 'Syne', sans-serif !important;
+            margin: 0 !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Hide the injected sub-stats to match the sleek design requirement */
+        #continue-learning-card>div>div:first-child>div {
+            display: none !important;
+        }
+
+        #continue-learning-card>div>button.btn-primary {
+            background: #FF4D00 !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+        }
+
+        #continue-learning-card>div>button.btn-primary:hover {
+            background: #e64500 !important;
+        }
+
+        /* 5. SUBJECTS SECTION CSS OVERRIDES FOR JS */
+        .section-header {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            font-family: 'Syne', sans-serif;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        /* Injected links wrapper */
+        #subjects-container a {
+            text-decoration: none !important;
+            display: block !important;
+        }
+
+        /* Override JS inserted injected glass-panel element */
+        #subjects-container .glass-panel {
+            background: #111111 !important;
+            border: 1px solid rgba(255, 255, 255, 0.06) !important;
+            border-radius: 12px !important;
+            padding: 24px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            flex-direction: row !important;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+            transition: transform 0.2s, border-color 0.2s !important;
+            height: auto !important;
+            box-sizing: border-box;
+        }
+
+        :root[data-theme="light"] #subjects-container .glass-panel {
+            background: white !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        #subjects-container .glass-panel:hover {
+            transform: translateY(-4px) !important;
+            border-color: rgba(255, 77, 0, 0.4) !important;
+        }
+
+        /* 1st child of panel: layout container for icon and name */
+        #subjects-container .glass-panel>div {
+            display: flex !important;
+            align-items: center !important;
+            gap: 16px !important;
+            margin-bottom: 0 !important;
+            flex: 1 !important;
+        }
+
+        /* Icon component inside subjects container */
+        #subjects-container .glass-panel>div>div {
+            width: 48px !important;
+            height: 48px !important;
+            border-radius: 50% !important;
+            /* Forces avatars perfectly round */
+            background: rgba(255, 77, 0, 0.1) !important;
+            /* Overrides blue */
+            color: #FF4D00 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 1.5rem !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* Subject Title text */
+        #subjects-container .glass-panel>div>h4 {
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+            font-family: 'Syne', sans-serif !important;
+            color: var(--text-primary) !important;
+            margin: 0 !important;
+        }
+
+        /* "Explore ->" orange button/text replacement */
+        #subjects-container .glass-panel>p {
+            color: #FF4D00 !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            margin: 0 !important;
+            opacity: 0.8 !important;
+            transition: opacity 0.2s !important;
+            white-space: nowrap !important;
+        }
+
+        #subjects-container .glass-panel:hover>p {
+            opacity: 1 !important;
+        }
+
+        /* 6. BOTTOM NAV (Mobile Only) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #111111;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 100;
+            padding: 0 16px;
+        }
+
+        :root[data-theme="light"] .bottom-nav {
+            background: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .bnav-list {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bnav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .bnav-item.active {
+            color: #FF4D00;
+        }
+
+        .bnav-item.active svg {
+            stroke: #FF4D00;
+        }
+
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-nav {
+                display: block;
+                /* Show bottom nav on mobile */
+            }
+
+            .container-main {
+                padding-bottom: 90px;
+                /* Make space for bottom nav */
+            }
+
+            .hero-section {
+                padding: 32px 24px 24px;
+            }
+
+            .hero-name {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dropdown-menu {
+                width: calc(100vw - 48px);
+                top: 64px;
+                right: 24px;
+            }
+
+            #continue-learning-card>div {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 16px !important;
+            }
+
+            #continue-learning-card>div>button.btn-primary {
+                width: 100% !important;
+                text-align: center !important;
+            }
+
+            .stats-row {
+                padding: 0 24px;
+                scroll-padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-hidden">
+    <!-- AUTH LOADER (REQUIRED) -->
+    <div class="auth-loader" id="auth-loader">
+        <div
+            style="width:40px;height:40px;border:3px solid #222;border-top-color:#FF4D00;border-radius:50%;animation:auth-spin 0.8s linear infinite">
+        </div>
+    </div>
+
+    <!-- 1. FIXED NAVBAR -->
+    <nav class="top-navbar">
+        <a href="home.html" class="navbar-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#nav-gradient)" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <defs>
+                    <linearGradient id="nav-gradient" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#FF4D00" />
+                        <stop offset="100%" stop-color="#FF8533" />
+                    </linearGradient>
+                </defs>
+                <path d="M4 19l16-14M4 5l16 14M2 12h20"></path>
+            </svg>
+            EasyMath
+        </a>
+
+        <div class="nav-actions">
+            <!-- Theme Toggle -->
+            <button id="theme-btn" class="theme-toggle" aria-label="Toggle Theme">
+                <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+
+            <!-- Avatar Dropdown -->
+            <div class="avatar-container">
+                <div class="user-avatar-btn user-avatar-initial" id="avatar-btn">U</div>
+                <div class="dropdown-menu" id="avatar-dropdown">
+                    <div class="dropdown-header">
+                        <span class="dropdown-name user-name-display">Loading...</span>
+                        <span class="dropdown-role user-role-display">Student Role</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="logout-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-main">
+        <!-- 2. HERO SECTION -->
+        <div class="hero-section">
+            <div class="hero-greeting" id="dynamic-greeting">Good day,</div>
+            <h2 class="hero-name heading-font user-name-display">Student</h2>
+            <p class="hero-subtitle">Here's your study dashboard</p>
+        </div>
+
+        <!-- 3. STATS ROW -->
+        <div class="stats-row">
+            <div class="stat-pill">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value" id="stat-subjects">0</span>
+                    <span class="stat-label">Subjects</span>
+                </div>
+            </div>
+
+            <div class="stat-pill">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 11 12 14 22 4"></polyline>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value" id="stat-tests">0</span>
+                    <span class="stat-label">Tests Taken</span>
+                </div>
+            </div>
+
+            <div class="stat-pill">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 10.45l2.67-2.67a1.99 1.99 0 0 0 0-2.82l-2.83-2.83a2 2 0 0 0-2.83 0l-2.67 2.67">
+                        </path>
+                        <path d="M12 21l-7.3-7.3a1.99 1.99 0 0 1 0-2.82l2.83-2.83a2 2 0 0 1 2.83 0L17 15"></path>
+                        <path d="M6 15l2 2"></path>
+                        <path d="M3 21l4-4"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value" id="stat-streak">0</span>
+                    <span class="stat-label">Streak</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. CONTINUE LEARNING CARD -->
+        <div class="dashboard-section">
+            <div id="continue-learning-card" style="display: none;">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </div>
+
+        <!-- 5. SUBJECTS SECTION -->
+        <div class="dashboard-section">
+            <h3 class="section-header">Your Subjects</h3>
+            <div class="subjects-grid" id="subjects-container">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. BOTTOM NAV (Mobile Only) -->
+    <nav class="bottom-nav">
+        <ul class="bnav-list">
+            <li>
+                <a href="home.html" class="bnav-item active">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="#subjects-container" class="bnav-item"
+                    onclick="document.getElementById('subjects-container').scrollIntoView({behavior: 'smooth'})">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Subjects
+                </a>
+            </li>
+            <li>
+                <a href="performance.html" class="bnav-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Performance
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- UI Interactions Script -->
+    <script>
+        // 1. Dynamic Greeting Logic
+        const hour = new Date().getHours();
+        let greeting = "Good evening,";
+        if (hour < 12) greeting = "Good morning,";
+        else if (hour < 17) greeting = "Good afternoon,";
+        document.getElementById('dynamic-greeting').textContent = greeting;
+
+        // 2. Theme Toggle Logic
+        document.getElementById('theme-btn').addEventListener('click', () => {
+            const root = document.documentElement;
+            const isDark = root.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            root.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // 3. Avatar Dropdown Logic
+        const avatarBtn = document.getElementById('avatar-btn');
+        const dropdown = document.getElementById('avatar-dropdown');
+
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && !avatarBtn.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/student/home.js"></script>
+</body>
+
+</html>
