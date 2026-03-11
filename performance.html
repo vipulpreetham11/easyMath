@@ -204,6 +204,10 @@
             }
         }
     </style>
+    <script>
+        const t = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+    </script>
 </head>
 
 <body class="page-hidden">
@@ -234,7 +238,7 @@
     </header>
 
     <div class="perf-container">
-        <h2 style="font-size: 2rem; margin-bottom: 8px;">📊 Your <span class="text-gradient">Performance</span></h2>
+        <h2 style="font-size: 2rem; margin-bottom: 8px;">Your <span class="text-gradient">Performance</span></h2>
         <p style="color: var(--text-secondary); margin-bottom: 32px;">Track your progress and identify areas for
             improvement.</p>
 
@@ -262,7 +266,7 @@
                     <div class="stat-label">Tests Taken</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">🎯</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-num" id="s-avg-acc" style="color: #f59e0b;">0%</div>
                     <div class="stat-label">Avg Accuracy</div>
                 </div>
@@ -272,7 +276,7 @@
                     <div class="stat-label">Best Score</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">💡</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-num" id="s-total-qs" style="color: var(--secondary-color);">0</div>
                     <div class="stat-label">Qs Attempted</div>
                 </div>
@@ -303,7 +307,7 @@
 
             <!-- 4. Subject Breakdown -->
             <div id="subject-section" style="display: none;">
-                <h3 class="section-title">📊 Subject Breakdown</h3>
+                <h3 class="section-title">Subject Breakdown</h3>
                 <div class="subject-grid" id="subject-grid"></div>
             </div>
         </div>

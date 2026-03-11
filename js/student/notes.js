@@ -135,6 +135,16 @@ function selectNote(id) {
             <iframe src="${note.pdf_url}" class="pdf-container"></iframe>
         `;
     }
+
+    // Add next/prev navigation
+    const noteIndex = notesData.findIndex(n => n.id === id);
+    const nextNote = notesData[noteIndex + 1];
+    const prevNote = notesData[noteIndex - 1];
+    let navHtml = '<div style="display:flex; gap:12px; margin-top:32px; padding:24px 0; border-top: 1px solid var(--border-color);">';
+    if (prevNote) navHtml += `<button onclick="selectNote('${prevNote.id}')" class="btn btn-outline" style="flex:1;">← Previous Note</button>`;
+    if (nextNote) navHtml += `<button onclick="selectNote('${nextNote.id}')" class="btn btn-primary" style="flex:1;">Next Note →</button>`;
+    navHtml += '</div>';
+    viewer.innerHTML += navHtml;
 }
 
 async function markChapterNotesCompleted() {
@@ -142,14 +152,20 @@ async function markChapterNotesCompleted() {
     btn.textContent = 'Saving...';
     btn.disabled = true;
 
-    // In Phase 4, call Edge Function `update-progress` to mark notes_completed
-    // Placeholder success simulation
-    setTimeout(() => {
-        btn.innerHTML = '✓ Completed! Returning...';
-        btn.style.background = 'linear-gradient(135deg, #059669, #047857)';
+    try {
+        if (window.currentUser && chapterId) {
+            await window.supabaseClient.from('progress').upsert({
+                user_id: window.currentUser.id,
+                chapter_id: chapterId,
+                notes_completed: true,
+                last_opened_at: new Date().toISOString()
+            }, { onConflict: 'user_id,chapter_id' });
+        }
+    } catch(e) {}
 
-        setTimeout(() => {
-            window.location.href = `app.html`;
-        }, 1500);
-    }, 1000);
+    btn.innerHTML = '✓ Completed! Returning...';
+    btn.style.background = 'linear-gradient(135deg, #059669, #047857)';
+    setTimeout(() => {
+        window.location.href = `app.html?chapter_id=${chapterId}`;
+    }, 1200);
 }

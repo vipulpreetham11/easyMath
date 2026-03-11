@@ -198,6 +198,16 @@ window.loadDashboard = async function () {
 
     // Check for recent chapter
     await checkRecentChapter();
+
+    // Auto-open chapter if redirected back from notes/practice/pyq
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnChapterId = urlParams.get('chapter_id');
+    if (returnChapterId) {
+        // Wait for syllabus to load then open chapter
+        setTimeout(() => window.loadChapter(returnChapterId), 800);
+        // Clean URL
+        window.history.replaceState({}, '', 'app.html');
+    }
 }
 
 function renderUnitsGrid(units) {
@@ -213,7 +223,9 @@ function renderUnitsGrid(units) {
         const card = document.createElement('div');
         card.className = 'subject-grid-card';
         card.innerHTML = `
-            <div class="subject-icon">📗</div>
+            <div class="subject-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
             <div class="subject-name">${unit.name}</div>
         `;
         // Scroll sidebar to unit and expand, then load first chapter
@@ -335,7 +347,7 @@ function renderSyllabusHTML(units, container) {
         // Unit Header (now top level)
         html += `
             <div class="acc-unit" data-id="${unit.id}" onclick="event.stopPropagation(); toggleUnit(this)">
-                📗 ${unit.name}
+                ${unit.name}
                 <svg class="chevron" width="14" height="14" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
             </div>
             <div class="chapters-wrapper" id="chaps-${unit.id}">
@@ -597,6 +609,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Desktop/Static Nav Links
     const navDash = document.getElementById('nav-dashboard');
     if (navDash) navDash.addEventListener('click', (e) => { e.preventDefault(); showView('view-dashboard'); });
+
+    const navSettings = document.getElementById('nav-settings');
+    if (navSettings) navSettings.addEventListener('click', (e) => { 
+        e.preventDefault(); 
+        showView('view-settings'); 
+    });
+
+    // Settings theme btn
+    const settingsThemeBtn = document.getElementById('settings-theme-btn');
+    if (settingsThemeBtn) settingsThemeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
 
     // Mobile Bottom Tabs
     const tabHome = document.getElementById('tab-home');

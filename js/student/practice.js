@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('back-btn').href = 'app.html';
-    document.getElementById('return-btn').onclick = () => window.location.href = 'app.html';
+    document.getElementById('return-btn').onclick = () => window.location.href = `app.html?chapter_id=${chapterId}`;
 
     setTimeout(initPractice, 500);
 });

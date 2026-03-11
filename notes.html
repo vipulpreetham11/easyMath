@@ -205,6 +205,10 @@
             }
         }
     </style>
+    <script>
+        const t = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+    </script>
 </head>
 
 <body class="page-hidden">
@@ -237,7 +241,7 @@
     <div class="notes-layout">
         <aside class="notes-sidebar">
             <div class="notes-sidebar-header">
-                <h3>📋 Chapter Notes</h3>
+                <h3>Chapter Notes</h3>
                 <p id="breadcrumb">Loading...</p>
             </div>
             <div id="notes-list">
@@ -246,7 +250,7 @@
                 </div>
             </div>
             <div class="progress-counter" id="progress-counter" style="display: none;">
-                📊 Opened: <span class="counter-num" id="opened-count">0</span> / <span id="total-count">0</span>
+                Opened: <span class="counter-num" id="opened-count">0</span> / <span id="total-count">0</span>
             </div>
         </aside>
 
