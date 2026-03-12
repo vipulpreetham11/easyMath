@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    document.getElementById('back-btn').href = `app.html`;
+    document.getElementById('back-btn').href = `app.html?chapter_id=${chapterId}`;
 
     setTimeout(() => {
         loadBreadcrumb(chapterId);

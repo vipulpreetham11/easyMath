@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    document.getElementById('back-btn').href = 'app.html';
+    document.getElementById('back-btn').href = `app.html?chapter_id=${chapterId}`;
     document.getElementById('return-btn').onclick = () => window.location.href = `app.html?chapter_id=${chapterId}`;
 
     setTimeout(initPyq, 500);

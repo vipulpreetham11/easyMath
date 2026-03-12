@@ -21,8 +21,8 @@ function renderUI(r) {
 
     // Back button
     if (r.chapter_id) {
-        document.getElementById('back-btn').href = 'app.html';
-        document.getElementById('retry-btn').onclick = () => window.location.href = 'app.html';
+        document.getElementById('back-btn').href = `app.html?chapter_id=${chapterId}`;
+        document.getElementById('retry-btn').onclick = () => window.location.href = `test.html?chapter_id=${chapterId}`;
     }
 
     // Score percentage
