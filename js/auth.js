@@ -54,7 +54,7 @@ async function signOut() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const path = window.location.pathname;
-    const isLogin = path.includes('login.html') || path.includes('index.html') || path === '/' || (path.endsWith('/') && !path.includes('app.html'));
+    const isLogin = path.includes('login.html');
     const isAdmin = path.includes('/admin/');
     const isSuperAdmin = path.includes('/super-admin/');
     const isStudent = path.includes('app.html') || path.includes('notes.html') || path.includes('practice.html') || path.includes('pyq.html') || path.includes('test.html') || path.includes('test-result.html') || path.includes('performance.html');
